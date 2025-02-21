@@ -1,0 +1,4 @@
+".\Objects\STARTUP.obj",
+".\Objects\DoorLock.obj" 
+TO ".\Objects\asm" 
+PRINT(".\Listings\asm.m51") RAMSIZE(256) 
