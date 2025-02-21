@@ -1,0 +1,10 @@
+".\Objects\STARTUP.obj",
+".\Objects\DC_Motor.obj",
+".\Objects\LCD.obj",
+".\Objects\delay.obj",
+".\Objects\UART.obj",
+".\Objects\main.obj",
+".\Objects\leds.obj",
+".\Objects\button.obj" 
+TO ".\Objects\InsideHomeSystem" 
+PRINT(".\Listings\InsideHomeSystem.m51")

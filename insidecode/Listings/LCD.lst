@@ -1,0 +1,96 @@
+C51 COMPILER V9.60.7.0   LCD                                                               12/20/2024 12:22:04 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE LCD
+OBJECT MODULE PLACED IN .\Objects\LCD.obj
+COMPILER INVOKED BY: D:\College\APP\C51\BIN\C51.EXE LCD.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\L
+                    -CD.lst) TABS(2) OBJECT(.\Objects\LCD.obj)
+
+line level    source
+
+   1          #include <reg51.h>
+   2          #include "delay.h"
+   3          #include "lcd.h"
+   4          
+   5          sbit LCD_RS = P0^1; 
+   6          sbit LCD_En = P0^0; 
+   7          
+   8          void LCD_init(void) {
+   9   1          /* Configure the Direction of Rs Pin to output pin */
+  10   1          LCD_RS = 0;
+  11   1          /* Configure the Direction of En Pin to output pin */
+  12   1          LCD_En = 0;
+  13   1          /* This Delay 20ms needed from datasheet */
+  14   1          delay_ms(20);
+  15   1          /* Set the LCD_DATA_PORT to output port */
+  16   1          LCD_DATA_PORT = 0x00;
+  17   1          /* use 2-lines LCD + 8-bits Data Mode + 5*7 dot display Mode */
+  18   1          LCD_sendCommand(LCD_TWO_LINES_EIGHT_BITS_MODE);
+  19   1          /* cursor off */
+  20   1          LCD_sendCommand(LCD_CURSOR_OFF);
+  21   1          /* clear LCD at the beginning */
+  22   1          LCD_sendCommand(LCD_CLEAR_COMMAND);
+  23   1      }
+  24          
+  25          void LCD_sendCommand(unsigned char command) {
+  26   1          LCD_RS = 0;      // RS = 0 for command
+  27   1          delay_ms(1);
+  28   1          LCD_En = 1;      // Enable high
+  29   1          delay_ms(1);
+  30   1          LCD_DATA_PORT = command; // Set command to data port
+  31   1          delay_ms(1);
+  32   1          LCD_En = 0;      // Enable low
+  33   1          delay_ms(1);
+  34   1      }
+  35          
+  36          void LCD_displayCharacter(unsigned char my_data) {
+  37   1          LCD_RS = 1;      // RS = 1 for data
+  38   1          delay_ms(1);
+  39   1          LCD_En = 1;      // Enable high
+  40   1          delay_ms(1);
+  41   1          LCD_DATA_PORT = my_data; // Set data to data port
+  42   1          delay_ms(1);
+  43   1          LCD_En = 0;      // Enable low
+  44   1          delay_ms(1);
+  45   1      }
+  46          
+  47          void LCD_displayString(const char *Str) {
+  48   1          unsigned char i;
+  49   1          for(i = 0; Str[i] != '\0'; i++) {
+  50   2              LCD_displayCharacter(Str[i]);
+  51   2          }
+  52   1      }
+  53          
+  54          void LCD_clearScreen(void) {
+C51 COMPILER V9.60.7.0   LCD                                                               12/20/2024 12:22:04 PAGE 2   
+
+  55   1          LCD_sendCommand(LCD_CLEAR_COMMAND);
+  56   1      }
+  57          
+  58          void LCD_moveCursor(unsigned char row, unsigned char col) {
+  59   1          unsigned char memory_address;
+  60   1          
+  61   1          /* Calculate the required address in the LCD DDRAM */
+  62   1          switch(row) {
+  63   2              case 0: memory_address = col; break;
+  64   2              case 1: memory_address = col + 0x40; break;
+  65   2              case 2: memory_address = col + 0x10; break;
+  66   2              case 3: memory_address = col + 0x50; break;
+  67   2          }                    
+  68   1          /* Move the LCD cursor to this specific address */
+  69   1          LCD_sendCommand(memory_address | LCD_SET_CURSOR_LOCATION);
+  70   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    192    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       7
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
