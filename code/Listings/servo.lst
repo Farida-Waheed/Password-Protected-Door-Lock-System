@@ -1,0 +1,71 @@
+C51 COMPILER V9.60.7.0   SERVO                                                             12/20/2024 10:30:32 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE SERVO
+OBJECT MODULE PLACED IN .\Objects\servo.obj
+COMPILER INVOKED BY: D:\College\APP\C51\BIN\C51.EXE servo.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings
+                    -\servo.lst) TABS(2) OBJECT(.\Objects\servo.obj)
+
+line level    source
+
+   1          #include "servo.h"
+   2          #include <reg51.h>
+   3          
+   4          sbit servo  = P3^4;
+   5          unsigned char gTH0_value = 0XFA ; 
+   6          unsigned char gTL0_value  = 0X24; 
+   7          
+   8          /*Servo Motor Functions*/
+   9            
+  10            /*
+  11            Value should be passed to timer 0 to rotate servo:  
+  12              1- For Rotate 0    -> we need  1.5   ms = 0XFA24
+  13              2- For Rotate 90   -> we need  1.74  ms = 0XF934
+  14              3- For Rotate 180  -> we need  2     ms = 0XF830
+  15              4- For Rotate -90  -> we need  1.24  ms = 0XFB28
+  16              5- For Rotate -180 -> we need  0.98  ms = 0XFC2C
+  17            */
+  18          
+  19          void Timer0_Start(void)
+  20          {
+  21   1        EA   = 1;
+  22   1        TR0  = 1;
+  23   1      }
+  24          
+  25          void SERVO_init(void)
+  26          {
+  27   1        TMOD = 0X01;
+  28   1        TH0  = gTH0_value;
+  29   1        TL0  = gTL0_value;
+  30   1        ET0  = 1;
+  31   1      }
+  32          
+  33          void SERVO_rotateDegree(unsigned char TH0_value, unsigned char TL0_value)
+  34          {
+  35   1        gTH0_value = TH0_value;
+  36   1        gTL0_value = TL0_value;
+  37   1      } 
+  38          
+  39          void SERVO_ISR (void) interrupt 1 //timer value 
+  40          {
+  41   1          servo = ~servo;
+  42   1          TF0   = 0;
+  43   1          TH0  = gTH0_value;
+  44   1          TL0  = gTL0_value;
+  45   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     33    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2    ----
+   IDATA SIZE       =   ----    ----
+C51 COMPILER V9.60.7.0   SERVO                                                             12/20/2024 10:30:32 PAGE 2   
+
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

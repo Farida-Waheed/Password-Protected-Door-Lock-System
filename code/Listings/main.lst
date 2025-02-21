@@ -1,0 +1,284 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              12/20/2024 15:36:36 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\College\APP\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\
+                    -main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <reg51.h>
+   2          #include "lcd.h"
+   3          #include "keypad.h"
+   4          #include "servo.h"
+   5          #include "uart.h"
+   6          #include "IR_sensor.h"
+   7          #include "Buzzer.h"
+   8          #include "leds.h"
+   9          #include "delay.h"
+  10          
+  11          /* The pointer to char_ act as array of char_ (string) for the saved pass */
+  12          const unsigned char  saved_pass[5] = {'1','2','3','4','\0'};
+  13          /* The array that store the current password the user enterd */
+  14          unsigned char entered_pass[5];
+  15          /* The flag used for check if the flag is true or not */
+  16          unsigned char correct_pass_flag = 0;
+  17          /* This flag needed for checking if the re-enterd password correct or not */
+  18          unsigned char reEnter_pass_flag = 0;
+  19          /* This counter indicats to limitation of password entering times */
+  20          unsigned char num_ofCorrect_Password = 3;
+  21          
+  22          
+  23          void receive_PasswordfromUser(void);
+  24          void password_isCorrect(void);
+  25          void servoMotor_Action(void);
+  26          void LCD_homeScreen(void);
+  27          
+  28          void main ()
+  29          { 
+  30   1        /* Local var for reading sensor value */
+  31   1        unsigned char IR_Read; 
+  32   1        /* Init LCD to be able to display */
+  33   1        LCD_init();
+  34   1        /* Prepare timer 1 to start */
+  35   1        Timer0_Start();
+  36   1        /* Init Servo at inital angle */
+  37   1        SERVO_init();
+  38   1        /* Init uart for serial communication */
+  39   1        uart_Init();
+  40   1        /* Init IR */
+  41   1        IR_Sensor_Init();
+  42   1        /* Put the initial state of buzzer is off */
+  43   1        BUZZER_status(BUZZER_OFF);
+  44   1        /* Put the initial state of red led is off */
+  45   1        RED_ledStatus(LED_OFF);
+  46   1        /* Put the initial state of green led is off */
+  47   1        GREEN_ledStatus(LED_OFF);
+  48   1        /* Function to display the home screen */
+  49   1        LCD_homeScreen();
+  50   1      
+  51   1      for(;;){
+  52   2            /* Store the read of the sensor in this variable and check on it */
+  53   2          IR_Read = IR_Sensor_Read();
+  54   2        
+C51 COMPILER V9.60.7.0   MAIN                                                              12/20/2024 15:36:36 PAGE 2   
+
+  55   2          if( IR_Read == IR_DETECT )
+  56   2          {
+  57   3          /* If sensor detect there is a person it will change screen to password screen */
+  58   3          LCD_clearScreen();  
+  59   3          LCD_displayString("Enter Password:");
+  60   3          LCD_moveCursor(1,0);
+  61   3            
+  62   3          /* Call this function for receiving password */
+  63   3          receive_PasswordfromUser();
+  64   3          password_isCorrect();
+  65   3          
+  66   3          /* Check on the password was matched to saved password */
+  67   3          if( correct_pass_flag == 0)
+  68   3          {
+  69   4            /* Make sure that the counter still contains it is value if the user enters matched password */
+  70   4            num_ofCorrect_Password = 3;
+  71   4            /* Function for making the servo motor rotate */
+  72   4            servoMotor_Action();
+  73   4            /* Send to internal system 'S' as Start your System */
+  74   4            uart_Sendbyte('S');
+  75   4            delay_ms(1000);
+  76   4            }
+  77   3          else
+  78   3          {
+  79   4            /* Decrement the counter by 1 due to the wrong password */
+  80   4            num_ofCorrect_Password--;
+  81   4            /* This case means that the useer enter the wrong password */
+  82   4            RED_ledStatus(LED_ON);
+  83   4            /* Enter this loop if the password is not true*/
+  84   4            while( num_ofCorrect_Password != 0 )
+  85   4            {
+  86   5            
+  87   5            LCD_clearScreen();
+  88   5            LCD_displayString("WRONG PASS");
+  89   5            delay_ms(150);
+  90   5            
+  91   5            RED_ledStatus(LED_OFF);
+  92   5            
+  93   5            LCD_clearScreen();
+  94   5            LCD_displayString("Enter Password:");
+  95   5            LCD_moveCursor(1,0);
+  96   5            
+  97   5            receive_PasswordfromUser();
+  98   5            password_isCorrect();
+  99   5            
+ 100   5            if( correct_pass_flag == 1)
+ 101   5            {
+ 102   6              num_ofCorrect_Password--;
+ 103   6              delay_ms(150);
+ 104   6              RED_ledStatus(LED_ON);
+ 105   6              BUZZER_status(BUZZER_ON);
+ 106   6      
+ 107   6            }
+ 108   5            else if( correct_pass_flag == 0)
+ 109   5            {
+ 110   6              reEnter_pass_flag = 1;
+ 111   6              num_ofCorrect_Password = 3;
+ 112   6              break;
+ 113   6            }
+ 114   5            else
+ 115   5            {
+ 116   6              /* Do No Thing */
+C51 COMPILER V9.60.7.0   MAIN                                                              12/20/2024 15:36:36 PAGE 3   
+
+ 117   6            }    
+ 118   5            }//End of While
+ 119   4          }//End of else if the password is not true
+ 120   3      
+ 121   3          if(reEnter_pass_flag == 1 )
+ 122   3          {
+ 123   4            /* Reset the flag to be able to enter here again */
+ 124   4            reEnter_pass_flag = 0;
+ 125   4            /* Function for making the servo motor rotate */
+ 126   4            servoMotor_Action();
+ 127   4            /* After finishing return to the home page */
+ 128   4            LCD_homeScreen();
+ 129   4            /* Send to internal system 'S' as Start your features */
+ 130   4            uart_Sendbyte('S');
+ 131   4            delay_ms(1000);
+ 132   4          }
+ 133   3            while(num_ofCorrect_Password == 0)
+ 134   3            {
+ 135   4              RED_ledStatus(LED_ON);
+ 136   4              GREEN_ledStatus(LED_ON);
+ 137   4              BUZZER_status(BUZZER_ON);
+ 138   4              
+ 139   4              LCD_clearScreen();
+ 140   4              LCD_moveCursor(0, 4);
+ 141   4              LCD_displayString("ACCESS DENIED");
+ 142   4              LCD_moveCursor(1, 0);
+ 143   4              LCD_displayString("INTRUDER ALERT!");
+ 144   4              delay_ms(5000);
+ 145   4              // Keep system locked until reset
+ 146   4              while (1) {
+ 147   5                  // Wait for reset 
+ 148   5              }
+ 149   4            }
+ 150   3          }
+ 151   2          else
+ 152   2          {
+ 153   3            LCD_homeScreen();
+ 154   3          }
+ 155   2        }
+ 156   1      }
+ 157          
+ 158          void receive_PasswordfromUser(void) {
+ 159   1          unsigned char i;
+ 160   1          unsigned char key;
+ 161   1          
+ 162   1          // Initialize the entered_pass array to 0
+ 163   1          for (i = 0; i < 4; i++) {
+ 164   2              entered_pass[i] = 0;
+ 165   2          }
+ 166   1          // Receive up to 4 digits
+ 167   1          i = 0;
+ 168   1          while (i < 4) {
+ 169   2              key = KEYPAD_getPressedKey();
+ 170   2              
+ 171   2              if (key == '#') {
+ 172   3                  break; // Exit the loop
+ 173   3              }
+ 174   2              
+ 175   2              // Check if the entered key is a digit
+ 176   2              if (key >= '0' && key <= '9') {
+ 177   3                  entered_pass[i] = key;
+ 178   3                  LCD_displayCharacter(entered_pass[i]);
+C51 COMPILER V9.60.7.0   MAIN                                                              12/20/2024 15:36:36 PAGE 4   
+
+ 179   3                  delay_ms(50);
+ 180   3                  i++;
+ 181   3              }
+ 182   2              // Check if the entered key is '*', to undo the last entered number
+ 183   2              else if (key == '*') {
+ 184   3                  if (i > 0) {
+ 185   4                      i--; // Move back to the previous position
+ 186   4                      entered_pass[i] = 0; // Clear the last entered number
+ 187   4                      LCD_moveCursor(1, i); // Move the cursor to the position of the last number
+ 188   4                      LCD_displayCharacter(' '); // Erase the last character on the LCD
+ 189   4                      LCD_moveCursor(1, i); // Move the cursor back to the cleared position
+ 190   4                  }
+ 191   3              }
+ 192   2              // Ignore any other key
+ 193   2              else {
+ 194   3                  // No action for non-digit and non-'*' keys
+ 195   3              }
+ 196   2              delay_ms(50);
+ 197   2          }
+ 198   1          // Wait until the user presses '#'
+ 199   1          while (KEYPAD_getPressedKey() != '#');
+ 200   1      }
+ 201          
+ 202          
+ 203          void password_isCorrect(void){
+ 204   1        unsigned char i;
+ 205   1        correct_pass_flag = 0;
+ 206   1        for( i = 0; i < 4 ; i++ )   {
+ 207   2            if(entered_pass[i] != saved_pass[i])// 1331 != 1221
+ 208   2            {
+ 209   3              /* if the password not true the flag will rise */
+ 210   3               correct_pass_flag = 1;
+ 211   3            }
+ 212   2          }
+ 213   1      }
+ 214          
+ 215          void servoMotor_Action(void){
+ 216   1            /* Make sure that the counter still contains it is value if the user enters matched password */
+ 217   1            num_ofCorrect_Password = 3;
+ 218   1            /* This case means that the useer enter the correct password */
+ 219   1            GREEN_ledStatus(LED_ON);
+ 220   1            LCD_clearScreen();
+ 221   1            delay_ms(50);
+ 222   1            
+ 223   1            /* Dispaly that the door is opened and open the door */
+ 224   1           LCD_moveCursor(0,6);
+ 225   1           LCD_displayString("Door");
+ 226   1           LCD_moveCursor(1,4);
+ 227   1           LCD_displayString("is Opened");
+ 228   1        
+ 229   1           SERVO_rotateDegree(0XF9,0X34);
+ 230   1           delay_ms(1500);
+ 231   1           
+ 232   1           /* Dispaly tehat the door is closed and close the door */
+ 233   1           LCD_clearScreen();
+ 234   1           LCD_moveCursor(0,6);
+ 235   1           LCD_displayString("Door");
+ 236   1           LCD_moveCursor(1,4);
+ 237   1           LCD_displayString("is Closed");
+ 238   1           
+ 239   1           SERVO_rotateDegree(0XFA,0X24);
+ 240   1           delay_ms(500);
+C51 COMPILER V9.60.7.0   MAIN                                                              12/20/2024 15:36:36 PAGE 5   
+
+ 241   1           
+ 242   1           /*Finally, turn off the green led because the door was closed*/
+ 243   1           GREEN_ledStatus(LED_OFF);
+ 244   1           
+ 245   1           LCD_clearScreen();
+ 246   1      }
+ 247          
+ 248          void LCD_homeScreen(void)
+ 249          {
+ 250   1            LCD_moveCursor(0,0);
+ 251   1            LCD_displayString("Welcome Home -_-");
+ 252   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    583    ----
+   CONSTANT SIZE    =     99    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     13       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

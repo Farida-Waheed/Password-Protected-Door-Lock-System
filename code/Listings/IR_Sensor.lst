@@ -1,0 +1,42 @@
+C51 COMPILER V9.60.7.0   IR_SENSOR                                                         12/20/2024 10:30:32 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE IR_SENSOR
+OBJECT MODULE PLACED IN .\Objects\IR_Sensor.obj
+COMPILER INVOKED BY: D:\College\APP\C51\BIN\C51.EXE IR_Sensor.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\List
+                    -ings\IR_Sensor.lst) TABS(2) OBJECT(.\Objects\IR_Sensor.obj)
+
+line level    source
+
+   1          #include "IR_Sensor.h"
+   2          
+   3          // Initialize the IR sensor (set it as input)
+   4          void IR_Sensor_Init(void) {
+   5   1          IR_SENSOR_PIN == 1; // Set IR sensor pin as input
+*** WARNING C275 IN LINE 5 OF IR_Sensor.c: expression with possibly no effect
+   6   1      }
+   7          
+   8          // Read the status of the IR sensor
+   9          unsigned char IR_Sensor_Read(void) {
+  10   1          // Return the current status of the IR sensor pin
+  11   1          // If the pin is low (0), object is detected
+  12   1          if (IR_SENSOR_PIN == 0) {
+  13   2              return IR_DETECT;  // Object detected
+  14   2          } else {
+  15   2              return IR_NO_DETECT;  // No object detected
+  16   2          }
+  17   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     10    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

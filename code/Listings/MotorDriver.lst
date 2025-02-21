@@ -1,0 +1,96 @@
+C51 COMPILER V9.60.7.0   MOTORDRIVER                                                       12/07/2024 04:04:06 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MOTORDRIVER
+OBJECT MODULE PLACED IN .\Objects\MotorDriver.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE MotorDriver.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listin
+                    -gs\MotorDriver.lst) TABS(2) OBJECT(.\Objects\MotorDriver.obj)
+
+line level    source
+
+   1          /*
+   2           * MotorDriver.c
+   3           *
+   4           *  Created on: Dec 7, 2024
+   5           *      Author: LOLO
+   6           */
+   7          
+   8          #include "MotorDriver.h"
+*** WARNING C318 IN LINE 8 OF MotorDriver.c: can't open file 'MotorDriver.h'
+   9          
+  10          // Initialize motor control pins and Timer for PWM
+  11          void MotorDriver_Init(void) {
+  12   1          // Set motor control pins as output
+  13   1          P1_1 = 0;  // Set IN1 to 0
+*** ERROR C202 IN LINE 13 OF MotorDriver.c: 'P1_1': undefined identifier
+  14   1          P1_2 = 0;  // Set IN2 to 0
+*** ERROR C202 IN LINE 14 OF MotorDriver.c: 'P1_2': undefined identifier
+  15   1          MOTOR_ENA_PIN = 0;  // Set enable pin to 0 (to disable motor initially)
+*** ERROR C202 IN LINE 15 OF MotorDriver.c: 'MOTOR_ENA_PIN': undefined identifier
+  16   1      
+  17   1          // Configure Timer for PWM (for speed control)
+  18   1          TMOD |= 0x02;  // Set Timer0 to Mode 2 (8-bit auto-reload)
+*** ERROR C202 IN LINE 18 OF MotorDriver.c: 'TMOD': undefined identifier
+  19   1          TH0 = 0x00;    // Load the timer high byte
+*** ERROR C202 IN LINE 19 OF MotorDriver.c: 'TH0': undefined identifier
+  20   1          TL0 = 0x00;    // Load the timer low byte
+*** ERROR C202 IN LINE 20 OF MotorDriver.c: 'TL0': undefined identifier
+  21   1          TR0 = 1;       // Start Timer0
+*** ERROR C202 IN LINE 21 OF MotorDriver.c: 'TR0': undefined identifier
+  22   1      }
+  23          
+  24          // Set motor speed using PWM (0-100% speed)
+  25          void MotorDriver_SetSpeed(uint8_t speedPercent) {
+*** ERROR C141 IN LINE 25 OF MotorDriver.c: syntax error near 'speedPercent', expected ')'
+  26   1          // Calculate the PWM value from the speed percentage (0 to 255)
+  27   1          uint8_t pwmValue = (speedPercent * 255) / 100;
+*** ERROR C141 IN LINE 27 OF MotorDriver.c: syntax error near 'pwmValue', expected ';'
+*** ERROR C202 IN LINE 27 OF MotorDriver.c: 'pwmValue': undefined identifier
+  28   1          TH0 = pwmValue;  // Set high byte of PWM duty cycle
+*** ERROR C202 IN LINE 28 OF MotorDriver.c: 'TH0': undefined identifier
+  29   1          TL0 = pwmValue;  // Set low byte of PWM duty cycle
+*** ERROR C202 IN LINE 29 OF MotorDriver.c: 'TL0': undefined identifier
+  30   1      }
+  31          
+  32          // Set motor direction: FORWARD, BACKWARD, or STOP
+  33          void MotorDriver_SetDirection(uint8_t direction) {
+*** ERROR C141 IN LINE 33 OF MotorDriver.c: syntax error near 'direction', expected ')'
+  34   1          switch(direction) {
+*** ERROR C202 IN LINE 34 OF MotorDriver.c: 'direction': undefined identifier
+  35   2              case FORWARD:
+*** ERROR C202 IN LINE 35 OF MotorDriver.c: 'FORWARD': undefined identifier
+  36   2                  P1_1 = 1;  // IN1 = 1
+*** ERROR C202 IN LINE 36 OF MotorDriver.c: 'P1_1': undefined identifier
+  37   2                  P1_2 = 0;  // IN2 = 0
+C51 COMPILER V9.60.7.0   MOTORDRIVER                                                       12/07/2024 04:04:06 PAGE 2   
+
+*** ERROR C202 IN LINE 37 OF MotorDriver.c: 'P1_2': undefined identifier
+  38   2                  break;
+  39   2              case BACKWARD:
+*** ERROR C202 IN LINE 39 OF MotorDriver.c: 'BACKWARD': undefined identifier
+  40   2                  P1_1 = 0;  // IN1 = 0
+*** ERROR C202 IN LINE 40 OF MotorDriver.c: 'P1_1': undefined identifier
+  41   2                  P1_2 = 1;  // IN2 = 1
+*** ERROR C202 IN LINE 41 OF MotorDriver.c: 'P1_2': undefined identifier
+  42   2                  break;
+  43   2              case STOP:
+*** ERROR C202 IN LINE 43 OF MotorDriver.c: 'STOP': undefined identifier
+  44   2                  P1_1 = 0;  // IN1 = 0
+*** ERROR C202 IN LINE 44 OF MotorDriver.c: 'P1_1': undefined identifier
+  45   2                  P1_2 = 0;  // IN2 = 0
+*** ERROR C202 IN LINE 45 OF MotorDriver.c: 'P1_2': undefined identifier
+  46   2                  break;
+  47   2              default:
+  48   2                  MotorDriver_Stop();  // Stop motor if invalid direction
+  49   2                  break;
+  50   2          }
+  51   1      }
+  52          
+  53          // Stop the motor by setting both inputs low
+  54          void MotorDriver_Stop(void) {
+  55   1          P1_1 = 0;  // IN1 = 0
+  56   1          P1_2 = 0;  // IN2 = 0
+  57   1      }
+  58          
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  23 ERROR(S)

@@ -1,0 +1,65 @@
+C51 COMPILER V9.60.7.0   DC_MOTOR                                                          12/20/2024 11:45:43 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE DC_MOTOR
+OBJECT MODULE PLACED IN .\Objects\DC_Motor.obj
+COMPILER INVOKED BY: D:\College\APP\C51\BIN\C51.EXE DC_Motor.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listi
+                    -ngs\DC_Motor.lst) TABS(2) OBJECT(.\Objects\DC_Motor.obj)
+
+line level    source
+
+   1          #include "dc_motor.h"
+   2          #include <reg51.h>
+   3          
+   4          
+   5          // Initialize DC Motor (set motor pins as output)
+   6          void Dc_Motor_Init(void)
+   7          {
+   8   1          P2 = 0x00;  // Set all Port 2 pins to low (turn off motor initially)
+   9   1          MOTOR_PIN_0 = 0;
+  10   1          MOTOR_PIN_1 = 0;
+  11   1          MOTOR_PIN_2 = 0;
+  12   1      }
+  13          
+  14          // Rotate motor in specified direction
+  15          void Dc_Motor_Rotate(unsigned char direction)
+  16          {
+  17   1          MOTOR_PIN_2 = 1;  // Enable motor (turn on motor driver, assuming active-high for control)
+  18   1      
+  19   1          switch(direction)
+  20   1          {
+  21   2              case ROTATE_LEFT:
+  22   2                  MOTOR_PIN_0 = 1;  // Set Pin 0 high (rotate left)
+  23   2                  MOTOR_PIN_1 = 0;  // Set Pin 1 low
+  24   2                  break;
+  25   2      
+  26   2              case ROTATE_RIGHT:
+  27   2                  MOTOR_PIN_1 = 1;  // Set Pin 1 high (rotate right)
+  28   2                  MOTOR_PIN_0 = 0;  // Set Pin 0 low
+  29   2                  break;
+  30   2      
+  31   2              case ROTATE_STOP:
+  32   2                  MOTOR_PIN_0 = 0;  // Set both pins low (stop motor)
+  33   2                  MOTOR_PIN_1 = 0;
+  34   2                  break;
+  35   2      
+  36   2              default:
+  37   2                  MOTOR_PIN_0 = 0;  // Default: Stop motor (set both pins low)
+  38   2                  MOTOR_PIN_1 = 0;
+  39   2                  break;
+  40   2          }
+  41   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     38    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

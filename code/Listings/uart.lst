@@ -1,0 +1,59 @@
+C51 COMPILER V9.60.7.0   UART                                                              12/20/2024 15:36:36 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE UART
+OBJECT MODULE PLACED IN .\Objects\uart.obj
+COMPILER INVOKED BY: D:\College\APP\C51\BIN\C51.EXE uart.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\
+                    -uart.lst) TABS(2) OBJECT(.\Objects\uart.obj)
+
+line level    source
+
+   1          #include "uart.h"
+   2          #include <reg51.h>
+   3          
+   4          void uart_Init(void)
+   5          {
+   6   1        /* Wrok with default UART that is 8_bit _data frame*/
+   7   1        SCON = 0x50;
+   8   1        /* Down the tarnsmit and receive flag  */
+   9   1        TI = 0; 
+  10   1        RI = 0;
+  11   1        /* SMOD reigster put 0 in last _bit*/
+  12   1        PCON &= ~(1<<7);
+  13   1        /* Using timer 1 in TMOD*/
+  14   1        TMOD |= (1<<5);
+  15   1        /* Set timer 1 to use buad rate 9600 */
+  16   1        TH1 = 253;
+  17   1        /* Enable timer 1 to count */
+  18   1        TR1 =1;
+  19   1      }
+  20          
+  21          void uart_Sendbyte(unsigned char ch)
+  22          {
+  23   1        SBUF  = ch;
+  24   1        while(TI != 1);
+  25   1        TI = 0;
+  26   1      }
+  27          
+  28          unsigned char uart_Receivebyte(void)
+  29          {
+  30   1        unsigned char buff;
+  31   1        while(RI != 1);
+  32   1        buff = SBUF;
+  33   1        RI = 0;
+  34   1        return buff;
+  35   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     35    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
