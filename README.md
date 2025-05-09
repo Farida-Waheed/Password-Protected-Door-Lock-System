@@ -6,7 +6,7 @@ A microcontroller-based secure door lock system developed using the **8051 micro
 
 - **University:** Benha University, Faculty of Engineering (Shoubra)
 - **Department:** Communications and Computer Engineering
-- **Course:** Embedded Systems / Microcontroller Applications
+- **Course:** Microprocessors and Microcontroller
 
 ## 👩‍💻 Team Members
 
