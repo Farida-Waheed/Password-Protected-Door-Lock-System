@@ -10,7 +10,7 @@ A microcontroller-based secure door lock system developed using the **8051 micro
 
 ## 👩‍💻 Team Members
 
-- Farida Waheed Abdel Bary 
+- Farida Waheed Abdelbary 
 - Nourhan Farag Mohamed 
 - Malak Mounier Abdellatif 
 - Razan Ahmed Fawzy 
